@@ -1,0 +1,8 @@
+SERVER_FQDN="hostname.domain.com"
+SERVER_HOSTNAME="hostname"
+WG_IFACE="wg0"
+WG_IPV4_NET="10.99.99"
+WG_IPV6_NET="fd99:99:99"
+WG_LAST_OCTET="254"
+WG_PORT="51820"
+WG_PRIVATE_KEY="<<< generate with wg genkey >>>"
