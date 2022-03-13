@@ -1,14 +1,25 @@
-echo "Client configs:"
+echo "Listing clients..."
+echo
 
+first=1
 shopt -s nullglob
 for config in clients/*.conf; do
-  echo "  $config:"
-  echo -n "    public key:  "
+  if [ -n "$first" ]; then
+    first=
+  else
+    echo
+  fi
+  echo "Config:     $config"
+  echo -n "Public Key: "
   grep "^PrivateKey = " "$config" | sed 's/.* = //' | wg pubkey
-  echo -n "    allowed ips: "
+  echo -n "Addresses:  "
   grep "^Address = " "$config" | sed 's/.* = //'
 done
 
-echo "Wireguard peers:"
+[ -n "$first" ] && echo "No clients."
 
-wg | tail -n +6 | grep -v '^$' | sed 's/^/  /g'
+echo
+echo "Wireguard peers:"
+echo
+
+wg show "$WG_IFACE" peers

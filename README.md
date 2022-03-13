@@ -26,9 +26,9 @@ Review and edit `rt.conf`. Then:
 Usage: ./rt <COMMAND> ...
 
   ./rt client create       Create a new client
+  ./rt client delete <N>   Delete client N
   ./rt client list         List clients
-  ./rt client qrcode <N>   Show QR code for client N
-  ./rt client remove <N>   Remove client N
+  ./rt client show <N>     Show local client N and its QR code
   ./rt client update <N>   Update client N
   ./rt config              Create rt.conf
   ./rt install             Install

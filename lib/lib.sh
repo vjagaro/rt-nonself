@@ -10,15 +10,7 @@ _rt_apt_ensure() {
   done
 }
 
-_rt_indent() {
-  {
-    "$@" 2>&1 1>&3 |
-      sed -u 's/^\(.*\)/  \x1b[31m\1\x1b[0m/'
-  } 3>&1 1>&2 |
-    sed -u 's/^\(.*\)/  \x1b[37m\1\x1b[0m/'
-}
-
-_rt_client_find() {
+_rt_find_client() {
   local n="$(echo "$1" | sed 's|^\(.*/\)\?\([0-9]\+\).*$|\2|')"
   if [ -n "$n" ]; then
     conf="$(ls -1 "clients/$n-"*".conf" 2>/dev/null | head -1)"
@@ -26,6 +18,14 @@ _rt_client_find() {
     conf=""
   fi
   echo "$conf"
+}
+
+_rt_indent() {
+  {
+    "$@" 2>&1 1>&3 |
+      sed -u 's/^\(.*\)/  \x1b[31m\1\x1b[0m/'
+  } 3>&1 1>&2 |
+    sed -u 's/^\(.*\)/  \x1b[37m\1\x1b[0m/'
 }
 
 _rt_load_conf() {
@@ -37,15 +37,27 @@ _rt_load_conf() {
   source rt.conf
 }
 
+_rt_report_client() {
+  echo
+  echo "Config:     $CLIENT_CONFIG"
+  echo "Public key: $CLIENT_PUBLIC_KEY"
+  echo "Address:    $CLIENT_ADDRESS"
+}
+
 _rt_require_client_config() {
   local arg="$1"
-  CLIENT_CONFIG="$(_rt_client_find "$arg")"
+  CLIENT_CONFIG="$(_rt_find_client "$arg")"
   if [ -z "$CLIENT_CONFIG" ]; then
     echo >&2 "ERROR: Client $arg not found."
     echo >&2
     echo >&2 "To see available clients, try: $0 client list"
     exit 1
   fi
+  CLIENT_ADDRESS="$(cat "$CLIENT_CONFIG" | grep '^Address = ' |
+    sed 's/.* = //')"
+  CLIENT_PRIVATE_KEY="$(cat "$CLIENT_CONFIG" | grep '^PrivateKey = ' |
+    sed 's/.* = //')"
+  CLIENT_PUBLIC_KEY="$(echo "$CLIENT_PRIVATE_KEY" | wg pubkey)"
 }
 
 _rt_require_root() {

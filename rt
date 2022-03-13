@@ -14,9 +14,9 @@ usage() {
 Usage: $0 <COMMAND> ...
 
   $0 client create       Create a new client
+  $0 client delete <N>   Delete client N
   $0 client list         List clients
-  $0 client qrcode <N>   Show QR code for client N
-  $0 client remove <N>   Remove client N
+  $0 client show <N>     Show local client N and its QR code
   $0 client update <N>   Update client N
   $0 config              Create rt.conf
   $0 install             Install
@@ -31,7 +31,7 @@ else
 fi
 
 case "$cmd" in
-client-qrcode | client-remove | client-update)
+client-delete | client-show | client-update)
   arg="${3:-}"
   if [ -z "$arg" ]; then
     echo >&2 "ERROR: No client argument."
