@@ -21,4 +21,4 @@ done
 echo
 echo "Wireguard peers:"
 
-wg show "$WG_IFACE" | tail -n +6
+wg show "$WG_IFACE" | tail -n +5
