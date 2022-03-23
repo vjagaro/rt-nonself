@@ -26,6 +26,14 @@ ff02::1         ip6-allnodes
 ff02::2         ip6-allrouters
 EOF
 
+echo "Configuring /etc/resolv.conf"
+
+rm /etc/resolv.conf
+cat <<-EOF >/etc/resolv.conf
+nameserver 1.1.1.1
+nameserver 1.0.0.1
+EOF
+
 echo "Configuring firewall..."
 
 _rt_apt_ensure nftables
@@ -91,11 +99,16 @@ _rt_indent sysctl --quiet --system
 
 echo "Installing network utilities..."
 
-_rt_apt_ensure nmap openssh-client openssl qrencode tcpdump 
+_rt_apt_ensure bind9-dnsutils bind9-host netcat nmap openssh-client openssl \
+  qrencode tcpdump
 
 echo "Installing automatic upgrades..."
 
 _rt_apt_ensure unattended-upgrades apt-listchanges
+
+echo "Installing Dnsmasq..."
+
+_rt_apt_ensure dnsmasq
 
 echo "Installing Wireguard..."
 
@@ -112,14 +125,8 @@ Address = $WG_IPV6_NET::$WG_LAST_OCTET/64
 SaveConfig = true
 ListenPort = $WG_PORT
 PrivateKey = $WG_PRIVATE_KEY
+PostUp = systemctl restart dnsmasq
 EOF
 
 _rt_indent systemctl enable wg-quick@$WG_IFACE
 _rt_indent systemctl start wg-quick@$WG_IFACE
-
-echo "Installing Dnsmasq..."
-
-_rt_apt_ensure dnsmasq
-
-# This must be restarted after bringing up Wireguard
-_rt_indent systemctl restart dnsmasq
